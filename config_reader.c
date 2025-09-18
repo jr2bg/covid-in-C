@@ -5,7 +5,6 @@
 #include "config_reader.h"
 
 char* read_ini_key(LPCSTR file, LPCSTR key) {
-    Settings settings;
     // define parts to be considered
     LPCSTR section = "Settings";
     char* returnValue;
@@ -27,6 +26,7 @@ char* read_ini_key(LPCSTR file, LPCSTR key) {
     }
     return returnValue;
 }
+/*
 Settings read_ini(LPCSTR file) {
     Settings settings;
     // define parts to be considered
@@ -48,11 +48,9 @@ Settings read_ini(LPCSTR file) {
         exit(0);
     }
 }
-
+*/
 Settings get_settings() {
-    // get the settings from the config file
-    size_t helper_size;
-    
+    // get the settings from the config file    
     Settings settings;
     // read the configs
     settings.n_rows = atoi(read_ini_key(".\\config.ini", "n_rows"));
@@ -81,3 +79,74 @@ Settings get_settings() {
 
     return settings;
 }
+
+/*
+Settings get_settings() {
+    Settings settings;
+    const char* filename = "config.ini";
+    FILE* file = fopen(filename, "r");
+    // if (file == NULL) {
+    //     return -1;
+    // }
+    char* fmt = (char*)malloc(1000);
+    strcpy(fmt, "[Settings]\n");
+    strcat(fmt, "n_rows=%d\n");
+    strcat(fmt, "n_cols=%d\n");
+    strcat(fmt, "radius=%d\n");
+    strcat(fmt, "pop_dens=%f\n");
+    strcat(fmt, "n_cycles=%d\n");
+    strcat(fmt, "R_0=%f\n");
+    strcat(fmt, "time_contagious=%d\n");
+    strcat(fmt, "case_fat_risk=%f\n");
+    strcat(fmt, "t_I=%d\n");
+    strcat(fmt, "p_R=%f\n");
+    strcat(fmt, "t_F=%d\n");
+    strcat(fmt, "t_L=%d\n");
+    strcat(fmt, "t_R=%d\n");
+    strcat(fmt, "p_S=%f\n");
+    strcat(fmt, "E_in=%d\n");
+    strcat(fmt, "I_in=%d\n");
+    strcat(fmt, "p_displ=%f\n");
+    strcat(fmt, "max_people=%d\n");
+    strcat(fmt, "p_e=%f\n");
+    strcat(fmt, "min_infectious=%d\n");
+    strcat(fmt, "p_q=%f");
+
+    if (
+        fscanf(
+            file,
+            fmt,
+            &settings.n_rows,
+            &settings.n_cols,
+            &settings.radius,
+            &settings.pop_dens,
+            &settings.n_cycles,
+            &settings.R_0,
+            &settings.time_contagious,
+            &settings.case_fat_risk,
+            &settings.t_I,
+            &settings.p_R,
+            &settings.t_F,
+            &settings.t_L,
+            &settings.t_R,
+            &settings.p_S,
+            &settings.t_S,
+            &settings.E_in,
+            &settings.I_in,
+            &settings.p_displ,
+            &settings.max_people,
+            &settings.p_e,
+            &settings.min_infectious,
+            &settings.p_q)== 22) {
+            printf("Successfully read.\np_q:%f\n",settings.p_q);
+    }
+    printf("Successfully read.\npop_dens:%f\n",settings.pop_dens);
+    fclose(file);
+    return settings;
+}
+
+int main(){
+    get_settings();
+    return 0;
+}
+*/

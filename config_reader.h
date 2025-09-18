@@ -31,8 +31,6 @@ typedef struct Settings {
     double p_q;
 } Settings;
 
-Settings read_ini(LPCSTR file);
-
 Settings get_settings();
 
 #endif

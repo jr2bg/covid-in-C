@@ -4,8 +4,6 @@
 #include "lib.h"
 #include "single_evolution.h"
 
-// #include "lib.h"
-
 typedef unsigned char ubyte;
 typedef unsigned int uint;
 // Y-coordinates y0, y1 and y2 are already pre-multiplied with world width.
@@ -24,7 +22,9 @@ int computeIterationSerial(
     size_t m_dataLength
 ) {
     ubyte temp;
+    // use linear distribution of 2D array
 	for (size_t y = 0; y < m_worldHeight; ++y) {
+        // y positions of the neighbourhood using 1D array
 		size_t y0 = ((y + m_worldHeight - 1) % m_worldHeight) * m_worldWidth;
 		size_t y1 = y * m_worldWidth;
 		size_t y2 = ((y + 1) % m_worldHeight) * m_worldWidth;
@@ -50,7 +50,6 @@ int computeIterationSerial(
 int main(int argc, char *argv[]){
     // at most three entries, model and cloud and help
     
-
     ubyte* m_data;
     ubyte* m_resultData;
 
@@ -76,8 +75,6 @@ int main(int argc, char *argv[]){
             printf("%d iteration\n", i);
         }
     }
-    
-    
 
     // deallocate memory
     free(m_data);

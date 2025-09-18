@@ -393,3 +393,22 @@ double calculate_p_e_neigh(
 // introduce errors)
 // change to iterate over people instead of cells
 // the iteration over cells will be done to get the p_e_neigh
+
+int copy_person(Person* source, Person* destination) {
+    destination->row = source->row;
+    destination->col = source -> col;
+    destination->original_location = source->original_location;
+    destination->time_in_state = source->time_in_state;
+    destination->st = source->st;
+
+    return 0;
+}
+
+int restart_cell_counter(Cell* cell){
+    // modify elements one by one, assigning the entry to 
+    // a new value causes an error
+    for(int i = 0; i < 6; i++){
+        cell->total_in_state[i] = 0;
+    }
+    return 0;
+}

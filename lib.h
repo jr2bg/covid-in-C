@@ -70,4 +70,10 @@ double calculate_p_e_neigh(
     double p_e
 );
 
+double get_cell_cumulative_p_e(double p_e, int n_infected_people);
+
+int copy_person(Person* source, Person* destination);
+
+int restart_cell_counter(Cell* cell);
+
 #endif
