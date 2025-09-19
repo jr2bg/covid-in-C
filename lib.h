@@ -26,9 +26,6 @@ typedef struct Person {
     size_t original_location;
     int time_in_state;
     State st;
-    // for double ll
-    struct Person* prev_person;
-    struct Person* next_person;
 } Person;
 
 //uint32_t in [0, 2^32 − 1 which equals 4,294,967,295]
@@ -76,4 +73,18 @@ int copy_person(Person* source, Person* destination);
 
 int restart_cell_counter(Cell* cell);
 
+int get_population_in_states(
+    counter cnt,
+    Person* population,
+    size_t total_population
+);
+
+Person* initialize_population(
+    size_t tot_pop,
+    size_t n_rows,
+    size_t n_cols,
+    uint32_t E_in,
+    uint32_t I_in,
+    bool arbitrary
+);
 #endif

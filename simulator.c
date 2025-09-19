@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 #include "lib.h"
 #include "single_evolution.h"
+#include "config_reader.h"
 
 typedef unsigned char ubyte;
 typedef unsigned int uint;
@@ -48,38 +51,101 @@ int computeIterationSerial(
 }
 
 int main(int argc, char *argv[]){
+
+    if (argc != 2) {
+        printf("Number of arguments does not match. ");
+        printf("Please use the format `program.exe <seisf|seiqsf>`\n");
+        return 3;
+    }
     // at most three entries, model and cloud and help
+    char* mod = argv[1];
+    Model model;
+
+    // universes
+    Cell *curr_univ, *next_univ;
     
-    ubyte* m_data;
-    ubyte* m_resultData;
+    // populations
+    Person *curr_pop, *next_pop;
 
-    size_t m_worldWidth = 1000;
-    size_t m_worldHeight = 1000;
-    uint total_iterations = 1000;
-    size_t m_dataLength = m_worldWidth * m_worldHeight;
+    // select the model depending on the value
+    if (strcmp(mod, "seisf") == 0) {
+        model = SEISF;
+    } else if (strcmp(mod, "seiqsf") == 0) {
+        model = SEIQSF;
+    } else {
+        printf("Model provided not found!");
+        return 3;
+    }
 
-    // allocate memory
-    m_data = (ubyte *)malloc(sizeof(ubyte *) * m_dataLength);
-    m_resultData = (ubyte *)malloc(sizeof(ubyte *) * m_dataLength);
+    // read the information from the ini file
+    Settings settings = get_settings();
+
+    // results of the deceased
+    uint32_t results_dec[settings.n_cycles + 1];
+    results_dec[0] = 0;
+
+    // total universe population
+    size_t tot_pop = settings.n_cols *settings.n_cols*settings.pop_dens;
+
+    // generate universe
+    curr_univ = generate_universe(settings.n_rows, settings.n_cols);
+    next_univ = generate_universe(settings.n_rows, settings.n_cols);
+
+    // generate population
+    curr_pop = initialize_population(
+        tot_pop,
+        settings.n_rows,
+        settings.n_cols,
+        settings.E_in,
+        settings.I_in,
+        false);
+        
+    next_pop = initialize_population(
+        tot_pop,
+        settings.n_rows,
+        settings.n_cols,
+        settings.E_in,
+        settings.I_in,
+        true);
 
     // iterations
-    for (uint i = 0; i < total_iterations; i++){
-        computeIterationSerial(
-            m_data,
-            m_resultData,
-            m_worldWidth,
-            m_worldHeight,
-            m_dataLength
+    for (uint i = 1; i <= settings.n_cycles; i++){
+        results_dec[i] = iterate_once(
+            model,
+            curr_pop,
+            next_pop,
+            curr_univ,
+            next_univ,
+            tot_pop,
+            settings.n_rows,
+            settings.n_cols,
+            settings.radius,
+            settings.p_e,
+            settings.p_q,
+            settings.case_fat_risk,
+            settings.p_S,
+            settings.t_S
         );
         if (i % 100 == 0) {
             printf("%d iteration\n", i);
         }
     }
 
-    // deallocate memory
-    free(m_data);
-    free(m_resultData);
+    // write file
+    FILE *fptr;
+    fptr = fopen("results.csv", "w");
+    for (uint i = 0; i <= settings.n_cycles; i++){
+        fprintf(fptr,"%d\n", results_dec[i]);
+    }
+    fclose(fptr);
 
-    printf("Hello world\n");
+
+    // deallocate memory for safety
+    free(curr_univ);
+    free(next_univ);
+    free(curr_pop);
+    free(next_pop);
+
+    // 
     return 0;
 }

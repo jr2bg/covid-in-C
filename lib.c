@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
+#include <time.h>
 #include <sys/param.h>
 
 #include "lib.h"
@@ -145,7 +147,7 @@ State s2e(Person* person, double p_e, double p_e_cell, double p_e_neigh) {
 State e2i(Person* person) {
     // no consideramos un tiempo
     double rand_numb = rand_0_1();
-    printf("selected random number %.4f\n", rand_numb);
+    //printf("selected random number %.4f\n", rand_numb);
 
     if (rand_numb <= ps_i[person->time_in_state]){
         // (*V).A is equal to V->A
@@ -411,4 +413,82 @@ int restart_cell_counter(Cell* cell){
         cell->total_in_state[i] = 0;
     }
     return 0;
+}
+
+int get_population_in_states(
+    counter cnt,
+    Person* population,
+    size_t total_population
+){
+    // cnt is expected to be in zero
+    for (size_t i = 0; i < total_population; i++){
+        // add one according to the persons' state
+        cnt[(population + i)->st]++;
+    }
+
+    return 0;
+}
+
+Person create_person(
+    size_t row,
+    size_t col,
+    size_t original_location,
+    int time_in_state,
+    State st
+){
+    Person person = {
+        .row = row,
+        .col = col,
+        .original_location = original_location,
+        .time_in_state = time_in_state,
+        .st = st
+    };
+
+    return person;
+}
+// initializes the population of the simulation
+Person* initialize_population(
+    size_t tot_pop,
+    size_t n_rows,
+    size_t n_cols,
+    uint32_t E_in,
+    uint32_t I_in,
+    // if true, populates with zeros, else executes the algo for create pop
+    bool arbitrary
+){
+    // dynamic allocation for the persons
+    Person* population = (Person*)malloc(tot_pop * sizeof(Person));
+
+    if (arbitrary) {
+        for (size_t i = 0; i < tot_pop; i++){
+            // initialization with zeros in case is arbitrary
+            *(population + i) = create_person(0,0,0,0,SUSCEPTIBLE);
+        }
+    } else {
+        srand(time(NULL));
+        size_t row, col, original_location;
+        int time_in_state;
+        State st;
+
+        // iterate for each person
+        for (size_t i = 0; i < tot_pop; i++){
+            row = rand() % n_rows;
+            col = rand() % n_cols;
+            original_location = row * n_cols + col;
+            time_in_state = 0;
+            if (i < E_in) {
+                st = EXPOSED;
+            } else if (i < E_in + I_in) {
+                st = INFECTED;
+            } else {
+                st = SUSCEPTIBLE;
+            }
+
+            *(population + i) = create_person(
+                                row,col,original_location,time_in_state,st);
+        }
+
+    }
+    
+    return population;
 }

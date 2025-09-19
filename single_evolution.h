@@ -3,7 +3,7 @@
 
 #include "lib.h"
 
-int iterate_once(
+uint32_t iterate_once(
     Model model,
     Person* curr_pop,
     Person* next_pop,

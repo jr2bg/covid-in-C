@@ -157,7 +157,7 @@ int evo_seisf(
 }
 
 // iterates once over the system
-int iterate_once(
+uint32_t iterate_once(
     Model model,
     Person* curr_pop,
     Person* next_pop,
@@ -176,6 +176,9 @@ int iterate_once(
     // temporary variables to swap population and universe later
     Person* temp_pop;
     Cell* temp_univ;
+
+    // total number of people in each state at the end of the iteration
+    counter cnt = {0,0,0,0,0,0};
 
     // execute the appropriate function depending on the model passed
     switch (model)
@@ -234,5 +237,10 @@ int iterate_once(
             restart_cell_counter(next_univ + r*n_cols + c);
         }
     }
-    return 0;
+
+    // get the counter for each state
+    get_population_in_states(cnt, curr_pop,total_pop);
+    // print the total number of deceased for this iteration
+    //printf("Total deceased: %d\n", cnt[DECEASED]);
+    return cnt[DECEASED];
 }
